@@ -14,6 +14,12 @@ public:
     void print();
     void draw();
     bool isOutside(int x, int y);
+    bool isCellEmpty(int x, int y);
+    bool isColumnFull(int x);
+    bool isRowFull(int y);
+    void clearRow(int y);
+    void moveRowDown(int y, int numRows);
+    int clearFullRows();
 
     int grid[20][10];
     int numRows;

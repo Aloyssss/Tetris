@@ -9,8 +9,8 @@
 #include "block/block.h"
 #include "block/blocks.cpp"
 
-#define SCREEN_WIDTH (300)
-#define SCREEN_HEIGHT (600)
+#define SCREEN_WIDTH (500)
+#define SCREEN_HEIGHT (620)
 #define WINDOW_TITLE "Tetris"
 
 class Game
@@ -26,11 +26,15 @@ private:
     void draw();
     void handleEvent();
     void cleanup();
+    void reset();
 
     bool isBlockOutOfBounds();
     Block getRandomBlock();
     bool triggerEvent(double interval);
     void lockBlock();
+    bool blockFits();
+    bool isGameOver();
+    void showGameOver();
 
     void moveBlockLeft();
     void moveBlockRight();
@@ -41,6 +45,7 @@ private:
     std::vector<Block> _blocks;
     Block _currentBlock;
     Block _nextBlock;
+    bool _gameOver;
 
     double _lastUpdateTime = 0;
 };

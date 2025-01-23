@@ -36,11 +36,12 @@ void Game::init()
 
     _currentBlock = getRandomBlock();
     _nextBlock = getRandomBlock();
+    _gameOver = false;
 }
 
 void Game::update()
 {
-    if (triggerEvent(0.8))
+    if (triggerEvent(0.6))
     {
         moveBlockDown();
     }
@@ -54,42 +55,58 @@ void Game::draw()
     _grid.draw();
     _currentBlock.draw();
 
+    if (_gameOver)
+        showGameOver();
+
     EndDrawing();
 }
 
 void Game::handleEvent()
 {
     int key = GetKeyPressed();
-    switch (key)
+
+    if (_gameOver && key == KEY_SPACE)
     {
-    case KEY_LEFT:
-        moveBlockLeft();
-        break;
-    
-    case KEY_RIGHT:
-        moveBlockRight();
-        break;
-
-    case KEY_DOWN:
-        moveBlockDown();
-        break;
-
-    case KEY_UP:
-        rotateBlock();
-        break;
-
-    case KEY_ESCAPE:
-        CloseWindow();
-        break;    
-    
-    default:
-        break;
+        init();
     }
+
+    // move block
+    if (!_gameOver)
+    {
+        switch (key)
+        {
+        case KEY_LEFT:
+            moveBlockLeft();
+            break;
+        
+        case KEY_RIGHT:
+            moveBlockRight();
+            break;
+        case KEY_DOWN:
+            moveBlockDown();
+            break;
+        case KEY_UP:
+            rotateBlock();
+            break;
+        }
+    }
+    
+    if (key == KEY_ESCAPE)
+        CloseWindow();
 }
 
 void Game::cleanup()
 {
     CloseWindow();
+}
+
+void Game::reset()
+{
+    _grid = Grid();
+    _blocks = {LBlock(), JBlock(), IBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
+    _currentBlock = getRandomBlock();
+    _nextBlock = getRandomBlock();
+    _gameOver = false;
 }
 
 bool Game::isBlockOutOfBounds()
@@ -133,28 +150,63 @@ void Game::lockBlock()
     {
         _grid.grid[item.y][item.x] = _currentBlock.id;
     }
+
     _currentBlock = _nextBlock;
+    if (!blockFits())
+    {
+        _gameOver = true;
+    }
+
     _nextBlock = getRandomBlock();
+    _grid.clearFullRows();
+}
+
+bool Game::blockFits()
+{
+    std::vector<Position> blockCells = _currentBlock.getCellPositions();
+    for (Position item : blockCells)
+    {
+        if (!_grid.isCellEmpty(item.x, item.y))
+            return false;
+    }
+    return true;
+}
+
+bool Game::isGameOver()
+{
+    for (int i = 0; i < 10; i++)
+    {
+        if (_grid.isColumnFull(i))
+            return true;
+    }
+}
+
+void Game::showGameOver()
+{
+    if (_gameOver)
+    {
+        DrawText("Game Over!", SCREEN_WIDTH/4, SCREEN_HEIGHT/2, 30, BLACK);
+    }
 }
 
 void Game::moveBlockLeft()
 {
     _currentBlock.move(-1, 0);
-    if (isBlockOutOfBounds())
+    if (isBlockOutOfBounds() || !blockFits())
         _currentBlock.move(1, 0);
 }
 
 void Game::moveBlockRight()
 {
     _currentBlock.move(1, 0);
-    if (isBlockOutOfBounds())
+    if (isBlockOutOfBounds() || !blockFits())
         _currentBlock.move(-1, 0);
 }
 
 void Game::moveBlockDown()
 {
     _currentBlock.move(0, 1);
-    if (isBlockOutOfBounds())
+    if (isBlockOutOfBounds() || !blockFits())
     {
         _currentBlock.move(0, -1);
         lockBlock();
@@ -166,6 +218,16 @@ void Game::rotateBlock()
     _currentBlock.rotate();
 
     std::vector<Position> blockCells = _currentBlock.getCellPositions();
+
+    for (Position item : blockCells)
+    {
+        if (!blockFits())
+        {
+            _currentBlock.rotate();
+            _currentBlock.rotate();
+            _currentBlock.rotate();
+        }
+    }
     
     int offsetX = 0;
     int offsetY = 0;

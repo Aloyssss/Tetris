@@ -51,3 +51,65 @@ bool Grid::isOutside(int x, int y)
     else
         return true;
 }
+
+bool Grid::isCellEmpty(int x, int y)
+{
+    if (grid[y][x] == 0)
+        return true;
+    return false;
+}
+
+bool Grid::isColumnFull(int x)
+{
+    for (int i = 0; i < numRows; i++)
+    {
+        if (grid[i][x] == 0)
+            return false;
+    }
+    return true;
+}
+
+bool Grid::isRowFull(int y)
+{
+    for (int i = 0; i < numCols; i++)
+    {
+        if (grid[y][i] == 0)
+            return false;
+    }
+    return true;
+}
+
+void Grid::clearRow(int y)
+{
+    for (int x = 0; x < numCols; x++)
+    {
+        grid[y][x] = 0;
+    }
+}
+
+void Grid::moveRowDown(int y, int numRows)
+{
+    for (int x = 0; x < numCols; x++)
+    {
+        grid[y + numRows][x] = grid[y][x];
+        grid[y][x] = 0;
+    }
+}
+
+int Grid::clearFullRows()
+{
+    int clearedRows = 0;
+    for (int i = numRows - 1; i >= 0; i--)
+    {
+        if (isRowFull(i))
+        {
+            clearRow(i);
+            clearedRows++;
+        }
+        else if (clearedRows > 0)
+        {
+            moveRowDown(i, clearedRows);
+        } 
+    }
+    return clearedRows;
+}
