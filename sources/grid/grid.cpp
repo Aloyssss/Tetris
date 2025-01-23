@@ -43,3 +43,11 @@ void Grid::draw()
         }
     }
 }
+
+bool Grid::isOutside(int x, int y)
+{
+    if (x >= 0 && x < numCols && y >= 0 && y < numRows)
+        return false;
+    else
+        return true;
+}

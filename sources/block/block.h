@@ -24,12 +24,13 @@ public:
     Block();
     void draw();
     void move(int x, int y);
+    void rotate();
+    std::vector<Position> getCellPositions();
 
     int id;
     std::map<int, std::vector<Position>> cells;
 private:
 
-    std::vector<Position> getCellPositions();
 
     int cellSize;
     int rotationState;

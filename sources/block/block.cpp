@@ -28,6 +28,11 @@ void Block::move(int x_offset, int y_offset)
 
 }
 
+void Block::rotate()
+{
+    rotationState = (rotationState + 1) % 4;
+}
+
 std::vector<Position> Block::getCellPositions()
 {
     std::vector<Position> tiles = cells[rotationState];

@@ -11,15 +11,17 @@ class Grid
 public:
     Grid();
 
-    void initialize();
     void print();
     void draw();
+    bool isOutside(int x, int y);
 
     int grid[20][10];
-
-private:
     int numRows;
     int numCols;
+
+private:
+    void initialize();
+
     int cellSize;
     std::vector<Color> colors;
 
